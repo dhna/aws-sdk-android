@@ -19,7 +19,6 @@ import android.content.Context;
 import android.support.test.InstrumentationRegistry;
 import android.util.Log;
 
-import com.amazonaws.AmazonClientException;
 import com.amazonaws.auth.AWSCredentialsProvider;
 import com.amazonaws.auth.CognitoCachingCredentialsProvider;
 import com.amazonaws.regions.Region;
@@ -40,7 +39,6 @@ import com.amazonaws.services.iot.model.UpdateCertificateRequest;
 
 import org.junit.After;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 import java.io.File;
@@ -120,7 +118,6 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         mqttConnect(mqttManager);
     }
 
-
     @Test
     public void mqttConnect_USEast1_Endpoint() throws Exception {
         DescribeEndpointRequest request = new DescribeEndpointRequest();
@@ -151,7 +148,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
     }
 
     @Test
-    public void mqttConnectMalformedEndpoints() throws Exception {
+    public void mqttConnectMalformedEndpoints() {
         DescribeEndpointRequest request = new DescribeEndpointRequest();
         request.setEndpointType("iot:Data");
         DescribeEndpointResult result = iotClient.describeEndpoint(request);
@@ -259,7 +256,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(1000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
 
         // verify connection events emitted
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
@@ -336,7 +333,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(1000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
 
         // verify connection events emitted
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
@@ -402,7 +399,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(1000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
 
         // verify connection events emitted
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
@@ -452,11 +449,12 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         // Wait for the operation
         Thread.sleep(3000);
 
-        // Disconnect
-        mqttManager.disconnect();
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connected, statuses.get(1));
 
-        // Wait for the operation
-        Thread.sleep(3000);
+        // Disconnect
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.ConnectionLost, statuses.get(2));
 
         // Connect
         mqttManager.connectUsingALPN(ks, callback);
@@ -464,13 +462,8 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         // Wait for the operation
         Thread.sleep(3000);
 
-        // verify connection events emitted
-        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
-        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connected, statuses.get(1));
-        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.ConnectionLost, statuses.get(2));
-        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(3));
-        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connected, statuses.get(4));
-
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(statuses.size() - 2));
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connected, statuses.get(statuses.size() - 1));
     }
 
     @Test
@@ -543,7 +536,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(1000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
 
         // verify connection events emitted
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
@@ -637,7 +630,8 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Reconnecting, statuses.get(2));
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect while reconnecting in progress should succeed.", mqttManager.disconnect());
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.ConnectionLost, statuses.get(3));
     }
 
     @Test
@@ -692,7 +686,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(2000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
 
         // ensure connection events emitted
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Connecting, statuses.get(0));
@@ -744,7 +738,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
 
         Thread.sleep(1000);
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
         // verify messages arrived on topic
         assertEquals(20, messages.size());
         int msgnum[] = new int[20];
@@ -806,7 +800,8 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.Reconnecting, statuses.get(2));
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect while reconnecting in progress should succeed.", mqttManager.disconnect());
+        assertEquals(AWSIotMqttClientStatusCallback.AWSIotMqttClientStatus.ConnectionLost, statuses.get(3));
     }
 
     /**
@@ -864,7 +859,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(2000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
         Thread.sleep(3000);
 
         // ensure connection events emitted
@@ -1008,7 +1003,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
         Thread.sleep(2000);
 
         // disconnect
-        mqttManager.disconnect();
+        assertTrue("Disconnect should succeed.", mqttManager.disconnect());
         Thread.sleep(3000);
 
         // ensure connection events emitted
@@ -1153,7 +1148,7 @@ public class MqttManagerIntegrationTest extends IoTIntegrationTestBase {
             DeletePolicyRequest deletePolicyRequest = new DeletePolicyRequest();
             deletePolicyRequest.setPolicyName(IOT_POLICY_NAME);
             iotClient.deletePolicy(deletePolicyRequest);
-        } catch (AmazonClientException e) {
+        } catch (Exception e) {
             // TODO Ignore failures in tearDown, but this needs to be fixed.
             e.printStackTrace();
         }

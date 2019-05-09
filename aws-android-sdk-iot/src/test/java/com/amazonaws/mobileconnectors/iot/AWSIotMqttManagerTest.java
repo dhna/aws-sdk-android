@@ -3,7 +3,6 @@ package com.amazonaws.mobileconnectors.iot;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import com.amazonaws.AmazonClientException;
@@ -357,7 +356,7 @@ public class AWSIotMqttManagerTest {
         testClient.connect(testKeystore, csb);
         mockClient.mockConnectSuccess();
         assertEquals(MqttManagerConnectionState.Connected, testClient.getConnectionState());
-        testClient.disconnect();
+        assertTrue(testClient.disconnect());
         assertEquals(MqttManagerConnectionState.Disconnected, testClient.getConnectionState());
         testClient.connect(testKeystore, csb);
         mockClient.mockConnectSuccess();
@@ -700,7 +699,7 @@ public class AWSIotMqttManagerTest {
         assertEquals(MqttManagerConnectionState.Reconnecting, testClient.getConnectionState());
 
         // user disconnect
-        testClient.disconnect();
+        assertTrue(testClient.disconnect());
         assertEquals(MqttManagerConnectionState.Disconnected, testClient.getConnectionState());
 
         // advance past reconnect time and ensure we don't attempt a reconnect
@@ -955,7 +954,7 @@ public class AWSIotMqttManagerTest {
         mockClient.mockConnectSuccess();
         assertEquals(MqttManagerConnectionState.Connected, testClient.getConnectionState());
 
-        testClient.disconnect();
+        assertTrue(testClient.disconnect());
         assertEquals(MqttManagerConnectionState.Disconnected, testClient.getConnectionState());
 
         assertEquals(1, mockClient.connectCalls);
@@ -971,9 +970,8 @@ public class AWSIotMqttManagerTest {
         testClient.setMqttClient(mockClient);
 
         mockClient.isConnected = false;
-        testClient.disconnect();
-
-        assertEquals(0, mockClient.disconnectCalls);
+        assertTrue(testClient.disconnect());
+        assertEquals(1, mockClient.disconnectCalls);
     }
 
     @Test(expected = AmazonClientException.class)

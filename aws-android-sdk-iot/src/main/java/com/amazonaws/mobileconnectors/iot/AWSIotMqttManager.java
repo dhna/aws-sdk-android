@@ -50,6 +50,7 @@ import java.util.HashMap;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.Map;
+import java.util.concurrent.CountDownLatch;
 
 import javax.net.SocketFactory;
 
@@ -823,7 +824,7 @@ public class AWSIotMqttManager {
         } catch (final NoSuchProviderException e) {
             throw new AWSIotCertificateException("A certificate error occurred.", e);
         } catch (final MqttException e) {
-            throw new AmazonClientException("An error occured in the MQTT client.", e);
+            throw new AmazonClientException("An error occurred in the MQTT client.", e);
         }
     }
 
@@ -998,32 +999,31 @@ public class AWSIotMqttManager {
     }
 
     /**
-     * Disconnect from a mqtt client (close current MQTT session).
+     * Disconnect from a MQTT client (close the current MQTT session).
      *
      * @return true if disconnect finished with success.
      */
     public boolean disconnect() {
         userDisconnect = true;
-        reset();
-        topicListeners.clear();
-        connectionState = MqttManagerConnectionState.Disconnected;
-        userConnectionCallback();
-        return true;
-    }
 
-    /**
-     * Disconnect the MQTT client. Issues a disconnect request if the client is
-     * connected.
-     */
-    void reset() {
         if (null != mqttClient) {
-            if (mqttClient.isConnected()) {
-                try {
-                    mqttClient.disconnect(0);
-                } catch (final MqttException e) {
-                    throw new AmazonClientException("Client error when disconnecting.", e);
+            try {
+                mqttClient.disconnectForcibly(0, 3 * 1000);
+                if (!mqttClient.isConnected()) {
+                    connectionState = MqttManagerConnectionState.Disconnected;
                 }
+            } catch (final MqttException e) {
+                throw new AmazonClientException("Client error when disconnecting.", e);
             }
+        }
+
+        userConnectionCallback();
+
+        if (MqttManagerConnectionState.Disconnected.equals(connectionState)) {
+            topicListeners.clear();
+            return true;
+        } else {
+            return false;
         }
     }
 
