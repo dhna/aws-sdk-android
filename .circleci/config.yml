@@ -21,7 +21,6 @@ commands:
     description: >-
       Check vars
     steps:
-      - configure_aws
       - set_enviroment_variables
       - run:
           name: Check vars
