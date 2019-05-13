@@ -18,6 +18,8 @@ commands:
             fi
 
   check_vars:
+    macos:
+      xcode: "10.1.0"  # Xcode version number does not matter here, we just need a MacOS image
     description: >-
       Check vars
     steps:
@@ -301,13 +303,15 @@ commands:
 jobs:
   build:
     working_directory: ~/code
-    docker:
-      - image: circleci/android:api-27-alpha
-    environment:
-      JVM_OPTS: -Xmx3200m
+    macos:
+      xcode: "10.1.0"  # Xcode version number does not matter here, we just need a MacOS image
+    # docker:
+    #   - image: circleci/android:api-27-alpha
+    # environment:
+    #   JVM_OPTS: -Xmx3200m
     steps:
-      - skip_job_if_required
-      - checkout
+    #   - skip_job_if_required
+    #   - checkout
       - check_vars
       - generate_gradle_wrapper
       - setup_android_platform23
