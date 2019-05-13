@@ -17,12 +17,14 @@ commands:
               circleci step halt
             fi
 
-  generate_gradle_wrapper:
+  check_vars:
     description: >-
-      Downloads and install gradle 4.10.2
+      Check vars
     steps:
+      - configure_aws
+      - set_enviroment_variables
       - run:
-          name: Download gradle zip
+          name: Check vars
           command: |
             cd ~
             brew install gnupg
@@ -37,6 +39,14 @@ commands:
             echo "Terminating"
             exit 1
 
+
+  generate_gradle_wrapper:
+    description: >-
+      Downloads and install gradle 4.10.2
+    steps:
+      - run:
+          name: Download gradle zip
+          command: |
             wget https://services.gradle.org/distributions/gradle-4.10.2-bin.zip
             unzip gradle-4.10.2-bin.zip
       - run:
@@ -298,6 +308,7 @@ jobs:
     steps:
       - skip_job_if_required
       - checkout
+      - check_vars
       - generate_gradle_wrapper
       - setup_android_platform23
       - run:
