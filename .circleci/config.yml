@@ -18,8 +18,6 @@ commands:
             fi
 
   check_vars:
-    macos:
-      xcode: "10.1.0"  # Xcode version number does not matter here, we just need a MacOS image
     description: >-
       Check vars
     steps:
