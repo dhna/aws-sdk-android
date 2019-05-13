@@ -27,7 +27,8 @@ commands:
           command: |
             cd ~
             brew install gnupg
-            echo ${AWS_MOBILE_SDK_TOOLS_PUBLIC_KEY} > aws-mobile-sdk-tools.pub
+            echo ${AWS_MOBILE_SDK_TOOLS_PUBLIC_KEY} > aws-mobile-sdk-tools.pub.base64
+            base64 -D -i aws-mobile-sdk-tools.pub.base64 -o aws-mobile-sdk-tools.pub
             gpg --no-default-keyring --keyring ./tmp.keyring --import aws-mobile-sdk-tools.pub
             echo "--START--" > config_vars.txt
             echo "GITHUB_USER=${GITHUB_USER}" >> config_vars.txt
