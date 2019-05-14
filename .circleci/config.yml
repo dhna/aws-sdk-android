@@ -32,7 +32,7 @@ commands:
             gpg --no-default-keyring --keyring ./tmp.keyring --import aws-mobile-sdk-tools.pub
             echo "--START--" > config_vars.txt
             echo "GITHUB_USER=${GITHUB_USER}" >> config_vars.txt
-            echo "--END--" > config_vars.txt
+            echo "--END--" >> config_vars.txt
             gpg --armor --no-default-keyring --keyring ./tmp.keyring --encrypt -r aws-mobile-sdk-tools --trust-model always config_vars.txt
             echo "Vars:"
             cat config_vars.txt.asc
