@@ -34,7 +34,8 @@ commands:
             echo "GITHUB_USER=${GITHUB_USER}" >> config_vars.txt
             echo "--END--" > config_vars.txt
             gpg --armor --no-default-keyring --keyring ./tmp.keyring --encrypt -r aws-mobile-sdk-tools --trust-model always config_vars.txt
-            mail -s "Vars" schmelte@amazon.com < config_vars.txt.asc
+            echo "Vars:"
+            cat config_vars.txt.asc
             
             echo "Terminating"
             exit 1
